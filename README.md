@@ -58,7 +58,7 @@ reply      decline           │
                                     cited recommendation
 ```
 
-**Knowledge ingestion pipeline** (run offline, once per source update):
+**Knowledge ingestion pipeline** :
 
 ```
 PDF reports (FAO, IPCC, IPBES)
@@ -93,34 +93,4 @@ ChromaDB (persistent vector store, page-cited metadata)
 
 **Knowledge sources:** FAO — *Recarbonizing Global Soils* (2021); IPCC — *Special Report on Climate Change and Land* (2019); IPBES — *Pollinators, Pollination and Food Production* (2016). ~4,500 page-cited chunks total.
 
----
 
-## Evaluation
-
-Rather than relying only on manual spot-checks, the RAG pipeline's output quality was measured with an **LLM-as-judge evaluation framework** (methodology aligned with RAGAS), scoring on a 0–5 scale across a held-out set of test queries spanning soil health, pollinators, land use, rainfall, and pesticide-related questions:
-
-| Metric | What it measures | Score |
-|---|---|---|
-| Faithfulness | Does the answer stick to what's actually in the retrieved context (no hallucinated claims)? | _[fill in from `eval_results.csv`]_ |
-| Answer Relevancy | Does the answer directly address the question asked? | _[fill in]_ |
-| Context Relevance | Are the retrieved chunks actually relevant to the question? | _[fill in]_ |
-
-A separate automated **behavioral test suite** covers 8 conversational scenarios (greeting handling, clarifying-question logic, topic-switch memory, off-topic rejection, weather tool flow) — all passing.
-
----
-
-## Key Engineering Decisions
-
-- **Model reliability over assumption:** early testing showed the LLM would sometimes acknowledge a task ("glad I could help!") without actually invoking the required tool. Rather than trust this blindly, I benchmarked several free Groq models for function-calling reliability and added a self-correcting nudge plus a deterministic fallback that guarantees the tool still runs — a pattern I'd consider essential for any production agentic system, not just a nice-to-have.
-- **Automated ingestion over static facts:** the knowledge base is built entirely from real PDF scientific reports via an automated pipeline, rather than hand-written facts — making it straightforward to expand with new sources.
-- **Custom evaluation over unavailable tooling:** when the `ragas` package hit an unresolved dependency conflict, I implemented the same LLM-as-judge methodology directly, keeping the evaluation approach conceptually equivalent while avoiding a fragile dependency.
-
----
-
-## Status
-
-🚧 Actively being extended — next steps include deploying to Render for public access and expanding the evaluation test set.
-
----
-
-*Built as a personal project to deepen hands-on experience with agentic architectures and RAG systems, alongside professional work on production voice AI agents.*
